@@ -34,11 +34,11 @@ app.get("/", (req, res) => {
 // Sneding Template
 // sendMessageTemplate(process.env.PHNO);
 
-app.post("/getMeds", (req, res) => {
-  console.log(req.body);
+// app.post("/getMeds", (req, res) => {
+//   console.log(req.body);
 
-  res.send("Message Sent");
-});
+//   res.send("Message Sent");
+// });
 
 let mytoken = "testing";
 
@@ -93,13 +93,7 @@ app.post("/webhook", async (req, res) => {
     console.log(messages);
     const interactiveData = messages.interactive;
     if (messages[0].button.text === "YES") {
-      const response = await Response.findOne({ phone: process.env.PHNO });
-
-      if (response.curremtSession == "Morning") {
-        response.Morning = true;
-      }
-
-
+     
       // fetch feedback from db
       const data = await Feedback.findOne({ phone: process.env.PHNO });
       data.setReminder = false;

@@ -1,5 +1,5 @@
-Medicine name   | Dosage                    | Duration
---------------- | ------------------------- | --------
-Amoxular        | 1 Morning, 1 Dinner       | 10 days
-Amoxular        | 1/2 Morning, 1/2 Dinner   | 7 days
-Amoxular        | 1 Lunch, 1 Dinner         | 10 days
+Medicine Name | Dosage                  | Duration
+------------- | ----------------------  | ---------
+Dalo          | 1 Morning, 1 Dinner     | 10 days
+Anvil         | 1 Lunch                 | 5 days
+Citrizine     | 1 Morning, 1 Lunch      | 2 days
