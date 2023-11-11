@@ -77,7 +77,7 @@ app.post("/webhook", async (req, res) => {
       console.error("Error processing the image:", error);
       res.sendStatus(500);
     }
-  }else if(messages && messages[0].type === "text") { 
+  } if(messages && messages[0].type === "text") { 
     console.log(messages[0].text.body);
     const response = await openAiMedBot(messages[0].text.body);
     sendMsg(response, process.env.PHNO);

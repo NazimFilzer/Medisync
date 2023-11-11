@@ -6,14 +6,26 @@ const openai = new OpenAI({
 
 // Function to read chat history from the JSON file
 function readChatHistory() {
-  try {
-    const data = fs.readFileSync("chat_history.json", "utf8");
-    return JSON.parse(data);
-  } catch (err) {
-    console.error(err);
-    return [];
+    try {
+      // Check if the file exists
+      if (!fs.existsSync('chat_history.json')) {
+        // If the file doesn't exist, return an empty array
+        return [];
+      }
+  
+      const data = fs.readFileSync('chat_history.json', 'utf8');
+  
+      // Handle empty file scenario
+      if (data === '') {
+        return [];
+      }
+  
+      return JSON.parse(data);
+    } catch (err) {
+      console.error(err);
+      return [];
+    }
   }
-}
 
 // Function to write chat history to the JSON file
 function writeChatHistory(history) {
