@@ -77,7 +77,7 @@ async function openAiMedPrecautions(medicineList) {
                     },
                     {
                         role: "user",
-                        content: `Provide a brief list precautions for these medicines: ${medicineList.join(", ")}. The output should be concise for WhatsApp messaging.`,
+                        content: `Provide a brief list precautions for these medicines: ${medicineList.join(", ")}. The output should be concise for WhatsApp messaging Only 3 points.`,
                     },
                 ],
             });
@@ -103,8 +103,14 @@ async function sendMedicineReminder(reminder) {
             whatsappService.sendMsg(precautions, reminder.recipientPhone);
         }
         whatsappService.sendMsg(message, reminder.recipientPhone);
+        setTimeout(() => {
+            whatsappService.sendMessageTemplate(process.env.PHNO);
+        }, 3000);
+
     }
 }
+
+
 
 function getCurrentTime() {
     const now = new Date();
@@ -122,19 +128,48 @@ function scheduleMedicineReminders() {
     ];
 
     reminderTimes.forEach(({ time, schedule }) => {
+        console.log("Scheduling reminder for:", time, schedule);
         cron.schedule(schedule, async () => {
             const meds = groupedMedicines[time];
             if (meds && meds.length > 0) {
+                // Schedule main medicine reminder
                 sendMedicineReminder({
                     meds,
                     recipientPhone: process.env.PHNO, // Replace with the recipient's phone number
                     time: schedule,
                 });
+
+                // Schedule follow-up reminder every 5 minutes for 3 times
+                // for (let i = 1; i <= 3; i++) {
+                //     const followUpSchedule = `${minute + i * 1} ${hour} * * *`;
+                //     cron.schedule(followUpSchedule, () => {
+                //         sendReminder({
+                //             meds,
+                //             recipientPhone: process.env.PHNO, // Replace with the recipient's phone number
+                //             time: schedule,
+                //         })
+                //     });
+                // }
             }
         });
     });
 }
 
+// async function sendReminder(reminder) {
+//     let message = `It's time to take your medicines: ${reminder.meds
+//         .map(
+//             (medicine) => `${medicine.MedicineName}, Dosage: ${medicine.Dosage}`
+//         )
+//         .join(" and ")}.`;
+
+//     if (reminder.meds && reminder.meds.length > 0) {
+//         await whatsappService.sendMsg(message, reminder.recipientPhone);
+//         setTimeout(() => {
+//             whatsappService.sendMessageTemplate(process.env.PHNO);
+//         }, 3000);
+//         //  whatsappService.sendMessageTemplate(process.env.PHNO);
+//     }
+// }
 
 
 module.exports = {
