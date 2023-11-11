@@ -3,7 +3,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
 app.use(bodyParser.json());
-const { sendMsg } = require("./src/services/whatsappService");
+const { sendMsg,sendMessageTemplate } = require("./src/services/whatsappService");
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
@@ -16,6 +16,7 @@ app.get("/", (req, res) => {
 
 });
 sendMsg("haistart",process.env.PHNO);
+sendMessageTemplate(process.env.PHNO);
 
 
 let mytoken = "testing";
