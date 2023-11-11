@@ -77,7 +77,7 @@ app.post("/webhook", async (req, res) => {
       console.error("Error processing the image:", error);
       res.sendStatus(500);
     }
-  } if(messages && messages[0].type === "text") { 
+  } else if(messages && messages[0].type === "text") { 
     const usermsg = messages[0].text.body;
     if(currentmsg!==usermsg){
       currentmsg=usermsg;
