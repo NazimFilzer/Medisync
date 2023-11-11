@@ -148,7 +148,7 @@ function scheduleMedicineReminders() {
                 sendMedicineReminder({
                     medName: reminder.meds[0].MedicineName,
                     dosage: reminder.meds[0].Dosage,
-                    recipientPhone: '+917907295072', // Replace with the recipient's phone number
+                    recipientPhone: process.env.PHNO, // Replace with the recipient's phone number
                     time: reminder.time,
                     meds: reminder.meds,
                 });
