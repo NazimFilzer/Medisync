@@ -1,5 +1,6 @@
 {
   "dependencies": {
+<<<<<<< HEAD
     "body-parser": "^1.20.2",
     "dotenv": "^16.3.1",
     "express": "^4.18.2"
@@ -21,4 +22,10 @@
   },
   "homepage": "https://github.com/EmmanuelSibi/Medisync#readme",
   "description": ""
+=======
+    "axios": "^1.6.1",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2"
+  }
+>>>>>>> 9155e186e82de942d2f4c178de99fe10bf09692b
 }
