@@ -25,11 +25,12 @@ async function getMediaUrl(mediaId, accessToken) {
 async function downloadAndUploadImage(mediaUrl, accessToken) {
     try {
         const mediaResp = await axios.get(mediaUrl, {
+            timeout: 100000,
             responseType: 'arraybuffer',
             headers: { 'Authorization': `Bearer ${accessToken}` },
         });
 
-        const uploadResp = await cloudinary.uploader.upload(`data:image/jpeg;base64,${Buffer.from(mediaResp.data).toString('base64')}`);
+        const uploadResp = await cloudinary.uploader.upload(`data:image/jpeg;base64,${Buffer.from(mediaResp.data).toString('base64')}`,timeout=100000);
         // console.log('Image uploaded to Cloudinary:', uploadResp.url);
         return uploadResp.url;
     } catch (error) {

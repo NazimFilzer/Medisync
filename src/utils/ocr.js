@@ -40,6 +40,7 @@ async function openAiMeds(ocr) {
 }
 
 
+
 async function ocr(imageUrl) {
     // const imageUrl = "http://res.cloudinary.com/dvlfsldbh/image/upload/v1699634498/hjomkdlac3dilbam72m0.jpg";
     console.log(imageUrl);
