@@ -62,8 +62,8 @@ app.post("/webhook", async (req, res) => {
       console.error("Error processing the image:", error);
       res.sendStatus(500);
     }
-  } else if (message.type === "interactive") {
-    const interactiveData = message.interactive;
+  } else if (messages.type === "interactive") {
+    const interactiveData = messages.interactive;
     if (interactiveData.type === "button_reply") {
       const payload = interactiveData.button_reply.payload;
 
@@ -82,7 +82,7 @@ app.post("/webhook", async (req, res) => {
   }
 });
 
-sendMsg("Hello Peeps", process.env.PHNO);
+//sendMsg("Hello Peeps", process.env.PHNO);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
