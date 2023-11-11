@@ -11,11 +11,12 @@ const axios = require("axios");
 const cloudinary = require("cloudinary").v2;
 const { getMediaUrl, downloadAndUploadImage } = require("./src/utils/getImage");
 const { ocr } = require("./src/utils/ocr");
-const { readMedicineDataFromFile, stopCron } = require("./src/utils/scheduler");
+const { readMedicineDataFromFile, stopCron,generateDietPlanForMedicines } = require("./src/utils/scheduler");
 const mongoose = require("mongoose");
 const fs = require("fs");
 const Feedback = require("./models/feedback");
 const { openAiMedBot } = require("./src/utils/userConv");
+const MedicineNames = require("./models/medicineNames");
 
 let currentmsg = "Hi";
 
@@ -81,14 +82,25 @@ app.post("/webhook", async (req, res) => {
       res.sendStatus(500);
     }
   } else if (messages && messages[0].type === "text") {
+   
     const usermsg = messages[0].text.body;
     if (currentmsg !== usermsg) {
       currentmsg = usermsg;
       console.log(messages[0].text.body);
-      const response = await openAiMedBot(messages[0].text.body);
-      sendMsg(response, process.env.PHNO);
-      res.sendStatus(200);
-
+      if (messages[0].text.body=="diet" || messages[0].text.body=="Diet")
+      {
+        const data = await MedicineNames.findOne({ phone: process.env.PHNO });
+        const medicineNames = data.medicineNames;
+        const dietPlan = await generateDietPlanForMedicines(medicineNames);
+        console.log("Generated Diet Plan");
+        sendMsg(dietPlan, process.env.PHNO);
+        res.sendStatus(200);
+      } else{
+        const response = await openAiMedBot(messages[0].text.body);
+        sendMsg(response, process.env.PHNO);
+        res.sendStatus(200);
+      }
+  
     }
     else {
       console.log("Same Message");

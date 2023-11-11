@@ -5,6 +5,7 @@ const whatsappService = require("../services/whatsappService");
 const OpenAI = require('openai').OpenAI;
 const Response = require('../../models/response');
 const Feedback = require("../../models/feedback");
+const MedicineNames = require("../../models/medicineNames");
 
 let remind_cron;
 
@@ -18,13 +19,23 @@ let groupedMedicines = {}; // Global variable to store grouped medicines
 let allMedicineNames = new Set();
 let allMedicines = [];
 
-function groupMedicinesByDosage(medicineData) {
+async function groupMedicinesByDosage(medicineData) {
     const medicines = {
         Morning: [],
         Lunch: [],
         Dinner: [],
     };
+    const medicineNames = medicineData.slice(2).map(item => item['Medicine name']);
 
+    // Now seach the phone number in the db and update the medicineNames array  
+
+    const saveMeds = await MedicineNames.findOneAndUpdate( 
+        { phone: process.env.PHNO },
+        { medicineNames },
+        { new: true }
+    );
+
+    console.log(medicineNames)
     medicineData.forEach((medicine) => {
         const dosage = medicine.Dosage.split(", ");
         dosage.forEach((dose) => {
@@ -43,40 +54,41 @@ function groupMedicinesByDosage(medicineData) {
     });
 
     return medicines;
+    
 }
 function getAllMedicineNames() {
     return Array.from(allMedicineNames);
 }
 
-///dietplan
-// async function generateDietPlanForMedicines(medicineNames) {
-//   try {
-//     console.log("Generating diet plan for medicines...");
-//     if (medicineNames && medicineNames.length > 0) {
-//       const response = await openai.chat.completions.create({
-//         model: "gpt-3.5-turbo",
-//         messages: [
-//           {
-//             role: "system",
-//             content:
-//               "You are a diet recommendation bot. Provide a diet plan considering the dietary needs and restrictions of specific medicines.",
-//           },
-//           {
-//             role: "user",
-//             content: `I am taking these medicines: ${medicineNames.join(
-//               ", "
-//             )}. What diet plan should I follow considering these medicines?`,
-//           },
-//         ],
-//       });
+async function generateDietPlanForMedicines(medicineNames) {
+  try {
+    console.log("Generating diet plan for medicines...");
+    if (medicineNames && medicineNames.length > 0) {
+      const response = await openai.chat.completions.create({
+        model: "gpt-3.5-turbo",
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are a diet recommendation bot. Provide a diet plan considering the dietary needs and restrictions of specific medicines.",
+          },
+          {
+            role: "user",
+            content: `I am taking these medicines: ${medicineNames.join(
+              ", "
+            )}. What diet plan should I follow considering these medicines? . give Me Specific Plans for Breakfast, Lunch and Dinner. Add foods from Indian Diet.`,
+          },
+        ],
+      });
 
-//       return response.choices[0].message.content;
-//     }
-//   } catch (err) {
-//     console.log(err);
-//   }
-// }
-////
+      return response.choices[0].message.content;
+    }
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+
 function readMedicineDataFromFile() {
     const medicineData = [];
     const fileStream = fs.createReadStream("medicine_data.txt");
@@ -159,7 +171,7 @@ async function sendMedicineReminder(reminder) {
             { phone: reminder.recipientPhone },
             { currentSession },
             { new: true }
-        );
+        ); // Remove this?
 
         whatsappService.sendMsg(message, reminder.recipientPhone);
         setTimeout(() => {
@@ -231,20 +243,6 @@ async function sendReminder(reminder) {
 
     if (reminder.meds && reminder.meds.length > 0) {
 
-        // Getting the Current Session time
-        // const dosageRegex = /\d+\s+(.+)/;
-
-        // // Extract the text after the number in Dosage for the first medicine
-        // const currentSession = reminder.meds[0].Dosage.match(dosageRegex)?.[1] || '';
-
-
-        // // Search the phone number in the db and update the currentSession
-        // const response = await Response.findOneAndUpdate(
-        //     { phone: reminder.recipientPhone },
-        //     { currentSession },
-        //     { new: true }
-        // );
-
         whatsappService.sendMsg(message, reminder.recipientPhone);
         setTimeout(() => {
             whatsappService.sendMessageTemplate(process.env.PHNO);
@@ -256,5 +254,5 @@ async function sendReminder(reminder) {
 module.exports = {
     readMedicineDataFromFile,
     stopCron,  // Export the remind_cron instance
-   
+    generateDietPlanForMedicines
 };

@@ -1,0 +1,10 @@
+[
+  {
+    "role": "user",
+    "content": "I have Rashes on my body. Who should i Consult"
+  },
+  {
+    "role": "assistant",
+    "content": "If you have rashes on your body, it is best to consult with a dermatologist. Dermatologists specialize in evaluating and treating skin conditions, including rashes. They will be able to diagnose the cause of the rash and recommend appropriate treatment. It's important to seek medical advice as some rashes may require immediate attention or could be a sign of a more serious underlying condition."
+  }
+]
