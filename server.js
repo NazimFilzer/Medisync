@@ -11,8 +11,8 @@ const axios = require("axios");
 const cloudinary = require("cloudinary").v2;
 const { getMediaUrl, downloadAndUploadImage } = require("./src/utils/getImage");
 const { ocr } = require("./src/utils/ocr");
+const { readMedicineDataFromFile } = require("./src/utils/scheduler");
 
-//use cors to allow cross origin resource sharing
 
 
 const app = express();
@@ -66,8 +66,6 @@ app.post("/webhook", async (req, res) => {
       const cloudinaryUrl = await downloadAndUploadImage(mediaUrl, accessToken);
       console.log("Cloudinary URL:", cloudinaryUrl);
       await ocr(cloudinaryUrl);
-
-
       res.sendStatus(200);
     } catch (error) {
       console.error("Error processing the image:", error);
@@ -92,6 +90,7 @@ app.post("/webhook", async (req, res) => {
 });
 
 //sendMsg("Hello Peeps", process.env.PHNO);
+// readMedicineDataFromFile();
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {

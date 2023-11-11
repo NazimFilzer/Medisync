@@ -4,6 +4,7 @@ const OpenAI = require('openai').OpenAI;
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
 });
+const { readMedicineDataFromFile } = require('./scheduler');
 
 
 
@@ -24,7 +25,7 @@ async function openAiMeds(ocr) {
                             Medecine1    | 1 Morning, 1 Dinner     | 10 days
                             Medecine1    | 1/2 Morning, 1/2 Dinner | 7 days
                             Medecine1    | 1 Lunch, 1 Dinner       | 10 days
-                            Convert to this correct format like this table`,
+                            Convert to this correct format like this table, I need this table only as output Nothing else`,
                     },
                 ],
             });
@@ -54,6 +55,8 @@ async function ocr(imageUrl) {
         const response = await axios.get(`https://api.apilayer.com/image_to_text/url?url=${imageUrl}`, requestOptions);
         console.log(response.data.all_text);
         await openAiMeds(response.data.all_text);
+        readMedicineDataFromFile();
+
 
 
     } catch (error) {
