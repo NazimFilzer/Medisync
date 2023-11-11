@@ -62,22 +62,19 @@ app.post("/webhook", async (req, res) => {
       console.error("Error processing the image:", error);
       res.sendStatus(500);
     }
-  } else if (messages[0].type === "interactive") {
+  } else if ( messages && messages[0].type === "button" && messages[0].context) {
     console.log(messages);
-    /*const interactiveData = messages.interactive;
-    if (interactiveData.type === "button_reply") {
-      const payload = interactiveData.button_reply.payload;
-
-      if (payload === "YES_BUTTON") {
+    const interactiveData = messages.interactive;
+    if (messages[0].button.text === "YES" ) {
         console.log("User clicked YES");
         sendMsg("you clicked yes", process.env.PHNO);
         // Add your logic here for YES button click
-      } else if (payload === "NO_BUTTON") {
+      } else if (messages[0].button.text === "NO" ) {
         console.log("User clicked NO");
         sendMsg("you clicked no", process.env.PHNO);
         // Add your logic here for NO button click
       }
-    }*/
+    res.sendStatus(200);
   } else {
     res.sendStatus(200);
   }
