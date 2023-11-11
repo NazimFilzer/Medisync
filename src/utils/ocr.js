@@ -61,11 +61,9 @@ async function ocr(imageUrl) {
 
     try {
         const response = await axios.get(`https://api.apilayer.com/image_to_text/url?url=${imageUrl}`, requestOptions);
-        console.log(response.data.all_text);
+        console.log("Got OCR text");
         await openAiMeds(response.data.all_text);
         readMedicineDataFromFile();
-
-
 
     } catch (error) {
         console.log(error.response.data); // Log the error response
