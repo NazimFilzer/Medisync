@@ -62,8 +62,9 @@ app.post("/webhook", async (req, res) => {
       console.error("Error processing the image:", error);
       res.sendStatus(500);
     }
-  } else if (messages.type === "interactive") {
-    const interactiveData = messages.interactive;
+  } else if (messages[0].type === "interactive") {
+    console.log(messages);
+    /*const interactiveData = messages.interactive;
     if (interactiveData.type === "button_reply") {
       const payload = interactiveData.button_reply.payload;
 
@@ -76,7 +77,7 @@ app.post("/webhook", async (req, res) => {
         sendMsg("you clicked no", process.env.PHNO);
         // Add your logic here for NO button click
       }
-    }
+    }*/
   } else {
     res.sendStatus(200);
   }
