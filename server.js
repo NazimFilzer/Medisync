@@ -3,6 +3,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
 app.use(bodyParser.json());
+const { sendMsg } = require("./src/services/whatsappService");
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
@@ -14,6 +15,7 @@ app.get("/", (req, res) => {
   res.send("Medication Reminder Service is running.");
 
 });
+sendMsg("haistart",process.env.PHNO);
 
 
 let mytoken = "testing";
@@ -32,3 +34,5 @@ app.get("/webhook", (req, res) => {
   }
 });
 console.log("hfff");
+
+
