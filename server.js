@@ -1,4 +1,6 @@
 require("dotenv").config();
+const cors = require("cors");
+
 const express = require("express");
 const bodyParser = require("body-parser");
 const {
@@ -8,19 +10,26 @@ const {
 const axios = require("axios");
 const cloudinary = require("cloudinary").v2;
 const { getMediaUrl, downloadAndUploadImage } = require("./src/utils/getImage");
+const { ocr } = require("./src/utils/ocr");
+
+//use cors to allow cross origin resource sharing
+
 
 const app = express();
 app.use(bodyParser.json());
+app.use(cors());
+
 
 app.get("/", (req, res) => {
   res.send("Medication Reminder Service is running.");
 });
 
-sendMessageTemplate(process.env.PHNO);
+// Sneding Template
+// sendMessageTemplate(process.env.PHNO);
 
-app.post("/sendMsg", (req, res) => {
-  const { message, number } = req.body;
-  sendMsg(message, number);
+app.post("/getMeds", (req, res) => {
+  console.log(req.body);
+
   res.send("Message Sent");
 });
 
@@ -56,24 +65,26 @@ app.post("/webhook", async (req, res) => {
       const mediaUrl = await getMediaUrl(mediaId, accessToken);
       const cloudinaryUrl = await downloadAndUploadImage(mediaUrl, accessToken);
       console.log("Cloudinary URL:", cloudinaryUrl);
+      await ocr(cloudinaryUrl);
+
 
       res.sendStatus(200);
     } catch (error) {
       console.error("Error processing the image:", error);
       res.sendStatus(500);
     }
-  } else if ( messages && messages[0].type === "button" && messages[0].context) {
+  } else if (messages && messages[0].type === "button" && messages[0].context) {
     console.log(messages);
     const interactiveData = messages.interactive;
-    if (messages[0].button.text === "YES" ) {
-        console.log("User clicked YES");
-        sendMsg("you clicked yes", process.env.PHNO);
-        // Add your logic here for YES button click
-      } else if (messages[0].button.text === "NO" ) {
-        console.log("User clicked NO");
-        sendMsg("you clicked no", process.env.PHNO);
-        // Add your logic here for NO button click
-      }
+    if (messages[0].button.text === "YES") {
+      console.log("User clicked YES");
+      sendMsg("you clicked yes", process.env.PHNO);
+      // Add your logic here for YES button click
+    } else if (messages[0].button.text === "NO") {
+      console.log("User clicked NO");
+      sendMsg("you clicked no", process.env.PHNO);
+      // Add your logic here for NO button click
+    }
     res.sendStatus(200);
   } else {
     res.sendStatus(200);
