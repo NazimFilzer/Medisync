@@ -15,8 +15,9 @@ const { readMedicineDataFromFile, stopCron } = require("./src/utils/scheduler");
 const mongoose = require("mongoose");
 const fs = require("fs");
 const Feedback = require("./models/feedback");
-// const openAiMedBot = require("./src/utils/userConv");
+const { openAiMedBot } = require("./src/utils/userConv");
 
+let currentmsg = "Hi";
 
 
 const app = express();
@@ -79,19 +80,28 @@ app.post("/webhook", async (req, res) => {
       console.error("Error processing the image:", error);
       res.sendStatus(500);
     }
-  } else if(messages && messages[0].type === "text") { 
-    // console.log(messages[0].text.body);
-    // const response = await openAiMedBot(messages[0].text.body);
-    // sendMsg(response, process.env.PHNO);
-    console.log(messages[0].text.body);
-    res.sendStatus(200);
+  } else if (messages && messages[0].type === "text") {
+    const usermsg = messages[0].text.body;
+    if (currentmsg !== usermsg) {
+      currentmsg = usermsg;
+      console.log(messages[0].text.body);
+      const response = await openAiMedBot(messages[0].text.body);
+      sendMsg(response, process.env.PHNO);
+      res.sendStatus(200);
+
+    }
+    else {
+      console.log("Same Message");
+      res.sendStatus(200);
+    }
+
   }
   else if (messages && messages[0].type === "button" && messages[0].context) {
 
     console.log(messages);
     const interactiveData = messages.interactive;
     if (messages[0].button.text === "YES") {
-   
+
       // fetch feedback from db
       const data = await Feedback.findOne({ phone: process.env.PHNO });
       data.setReminder = false;

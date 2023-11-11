@@ -1,5 +1,5 @@
-Medicine name | Dosage                  | Duration
-------------- | ----------------------- | --------
-Dalo          | 1 Morning, 1 Dinner     | 10 days
-Anvil         | 1 Lunch                 | 5 days
-Citrizine     | 1 Morning, 1 Lunch      | 2 days
+Medicine Name   | Dosage                  | Duration
+-------------- | ----------------------- | ------------
+Dalo           | 1 Morning, 1 Dinner     | 10 days
+Anvil          | 1 Lunch                 | 5 days
+Citrizine      | 1 Morning, 1 Lunch      | 2 days
