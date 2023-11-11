@@ -11,8 +11,11 @@ const axios = require("axios");
 const cloudinary = require("cloudinary").v2;
 const { getMediaUrl, downloadAndUploadImage } = require("./src/utils/getImage");
 const { ocr } = require("./src/utils/ocr");
-const { readMedicineDataFromFile } = require("./src/utils/scheduler");
+const { readMedicineDataFromFile, stopCron } = require("./src/utils/scheduler");
 const mongoose = require("mongoose");
+const fs = require("fs");
+const Feedback = require("./models/feedback");
+const {openAiMedBot} = require("./src/utils/userConv");
 
 
 
@@ -101,18 +104,23 @@ app.post("/webhook", async (req, res) => {
     console.log(messages);
     const interactiveData = messages.interactive;
     if (messages[0].button.text === "YES") {
-      const response= await Response.findOne({phone: process.env.PHNO});
-      
-      if(response.curremtSession =="Morning"){
+      const response = await Response.findOne({ phone: process.env.PHNO });
+
+      if (response.curremtSession == "Morning") {
         response.Morning = true;
       }
 
 
+      // fetch feedback from db
+      const data = await Feedback.findOne({ phone: process.env.PHNO });
+      data.setReminder = false;
+      data.save();
 
+      // Stop the remind_cron
+      stopCron();
 
-      console.log("User clicked YES");
-      sendMsg("you clicked yes", process.env.PHNO);
-      // Add your logic here for YES button click
+      console.log("Cron job stooped and Ate the meds");
+
     } else if (messages[0].button.text === "NO") {
       console.log("User clicked NO");
       sendMsg("you clicked no", process.env.PHNO);
@@ -125,7 +133,7 @@ app.post("/webhook", async (req, res) => {
 });
 
 //sendMsg("Hello Peeps", process.env.PHNO);
-readMedicineDataFromFile();
+// readMedicineDataFromFile();
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
