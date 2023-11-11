@@ -11,6 +11,7 @@ const { readMedicineDataFromFile } = require('./scheduler');
 async function openAiMeds(ocr) {
     try {
         if (ocr) {
+            console.log("Putting OCR text in openAI");
             const response = await openai.chat.completions.create({
                 model: "gpt-3.5-turbo",
                 messages: [
@@ -30,7 +31,7 @@ async function openAiMeds(ocr) {
                 ],
             });
 
-            console.log(response.choices[0].message.content);
+            // console.log(response.choices[0].message.content);
             writeTofile(response.choices[0].message.content);
         }
 
@@ -50,7 +51,6 @@ whatsappService.sendMsg(dietPlan, process.env.PHNO);*/
 
 async function ocr(imageUrl) {
     // const imageUrl = "http://res.cloudinary.com/dvlfsldbh/image/upload/v1699634498/hjomkdlac3dilbam72m0.jpg";
-    console.log(imageUrl);
     const apiKey = "gcI3MxczYbqSdf84r2JFwN5SAc4CSUCr";
     const requestOptions = {
         method: "GET",

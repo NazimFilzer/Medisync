@@ -15,9 +15,9 @@ const { readMedicineDataFromFile, stopCron } = require("./src/utils/scheduler");
 const mongoose = require("mongoose");
 const fs = require("fs");
 const Feedback = require("./models/feedback");
-const {openAiMedBot} = require("./src/utils/userConv");
+const { openAiMedBot } = require("./src/utils/userConv");
 
-
+let currentmsg="Hi";
 
 const app = express();
 app.use(bodyParser.json());
@@ -80,23 +80,20 @@ app.post("/webhook", async (req, res) => {
       console.error("Error processing the image:", error);
       res.sendStatus(500);
     }
-  } else if(messages && messages[0].type === "text") { 
+  } else if (messages && messages[0].type === "text") {
     const usermsg = messages[0].text.body;
-    if(currentmsg!==usermsg){
-      currentmsg=usermsg;
+    if (currentmsg !== usermsg) {
+      currentmsg = usermsg;
       console.log(messages[0].text.body);
-    const response = await openAiMedBot(messages[0].text.body);
-    sendMsg(response, process.env.PHNO);
-    res.sendStatus(200);
+      const response = await openAiMedBot(messages[0].text.body);
+      sendMsg(response, process.env.PHNO);
+      res.sendStatus(200);
 
     }
-    else{
+    else {
       console.log("Same Message");
       res.sendStatus(200);
     }
-    
-    
-
 
   }
   else if (messages && messages[0].type === "button" && messages[0].context) {
@@ -104,13 +101,7 @@ app.post("/webhook", async (req, res) => {
     console.log(messages);
     const interactiveData = messages.interactive;
     if (messages[0].button.text === "YES") {
-      const response = await Response.findOne({ phone: process.env.PHNO });
-
-      if (response.curremtSession == "Morning") {
-        response.Morning = true;
-      }
-
-
+      
       // fetch feedback from db
       const data = await Feedback.findOne({ phone: process.env.PHNO });
       data.setReminder = false;

@@ -178,9 +178,9 @@ function getCurrentTime() {
 function scheduleMedicineReminders() {
     const { hour, minute } = getCurrentTime();
     const reminderTimes = [
-        { time: "Morning", schedule: `${minute + 2} ${hour} * * *` },
-        { time: "Lunch", schedule: `${minute + 3} ${hour} * * *` },
-        { time: "Dinner", schedule: `${minute + 4} ${hour} * * *` },
+        { time: "Morning", schedule: `${minute + 1} ${hour} * * *` },
+        { time: "Lunch", schedule: `${minute + 2} ${hour} * * *` },
+        { time: "Dinner", schedule: `${minute + 3} ${hour} * * *` },
     ];
 
     reminderTimes.forEach(({ time, schedule }) => {
@@ -231,19 +231,7 @@ async function sendReminder(reminder) {
 
     if (reminder.meds && reminder.meds.length > 0) {
 
-        // Getting the Current Session time
-        // const dosageRegex = /\d+\s+(.+)/;
-
-        // // Extract the text after the number in Dosage for the first medicine
-        // const currentSession = reminder.meds[0].Dosage.match(dosageRegex)?.[1] || '';
-
-
-        // // Search the phone number in the db and update the currentSession
-        // const response = await Response.findOneAndUpdate(
-        //     { phone: reminder.recipientPhone },
-        //     { currentSession },
-        //     { new: true }
-        // );
+       
 
         whatsappService.sendMsg(message, reminder.recipientPhone);
         setTimeout(() => {
