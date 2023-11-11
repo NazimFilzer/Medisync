@@ -178,7 +178,7 @@ function getCurrentTime() {
 function scheduleMedicineReminders() {
     const { hour, minute } = getCurrentTime();
     const reminderTimes = [
-        { time: "Morning", schedule: `${minute + 2} ${hour} * * *` },
+        { time: "Morning", schedule: `${minute + 1} ${hour} * * *` },
         { time: "Lunch", schedule: `${minute + 3} ${hour} * * *` },
         { time: "Dinner", schedule: `${minute + 4} ${hour} * * *` },
     ];

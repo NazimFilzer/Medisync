@@ -82,4 +82,3 @@ writeTofile = (data) => {
 }
 
 
-// Define a route to handle the POST request
