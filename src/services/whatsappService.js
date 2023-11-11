@@ -46,15 +46,6 @@ const sendMessageTemplate = async (recipientPhone) => {
       },
       components: [
         {
-          type: "body",
-          parameters: [
-            {
-              type: "text",
-              text: "Did you take all your *medicines for this session* ?"
-            }
-          ]
-        },
-        {
           type: "button",
           sub_type: "quick_reply",
           index: "0",
