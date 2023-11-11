@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require("express");
 const bodyParser = require("body-parser");
-const { sendMsg } = require("./src/services/whatsappService");
+const { sendMsg,sendMessageTemplate } = require("./src/services/whatsappService");
 const axios = require('axios');
 const cloudinary = require('cloudinary').v2;
 const { getMediaUrl, downloadAndUploadImage } = require('./src/utils/getImage');
@@ -9,13 +9,12 @@ const { getMediaUrl, downloadAndUploadImage } = require('./src/utils/getImage');
 
 const app = express();
 app.use(bodyParser.json());
-const { sendMsg,sendMessageTemplate } = require("./src/services/whatsappService");
 
 
 app.get("/", (req, res) => {
   res.send("Medication Reminder Service is running.");
 });
-sendMsg("haistart",process.env.PHNO);
+
 sendMessageTemplate(process.env.PHNO);
 
 app.post("/sendMsg", (req, res) => {
@@ -69,7 +68,7 @@ app.post('/webhook', async (req, res) => {
   }
 });
 
-sendMsg("Hello Peeps", +917907295072);
+sendMsg("Hello Peeps", process.env.PHNO);
 
 
 
