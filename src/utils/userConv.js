@@ -76,8 +76,5 @@ async function openAiMedBot(userMessage) {
   }
 }
 
-// Example usage
-openAiMedBot("I have a headache and a cough.")
-  .then((response) => console.log("AI Response:", response))
-  .catch((err) => console.error(err));
+
 module.exports = { openAiMedBot };

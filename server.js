@@ -15,7 +15,7 @@ const { readMedicineDataFromFile, stopCron } = require("./src/utils/scheduler");
 const mongoose = require("mongoose");
 const fs = require("fs");
 const Feedback = require("./models/feedback");
-const openAiMedBot = require("./src/utils/userConv");
+const {openAiMedBot} = require("./src/utils/userConv");
 
 
 
