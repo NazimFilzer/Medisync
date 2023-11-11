@@ -3,6 +3,7 @@ const fs = require("fs");
 const readline = require("readline");
 const whatsappService = require("../services/whatsappService");
 const OpenAI = require('openai').OpenAI;
+const Response = require('../../models/response')
 
 // Initialize OpenAI
 const openai = new OpenAI({
@@ -102,6 +103,26 @@ async function sendMedicineReminder(reminder) {
         if (precautions) {
             whatsappService.sendMsg(precautions, reminder.recipientPhone);
         }
+
+        // Getting the Current Session time
+        const dosageRegex = /\d+\s+(.+)/;
+
+        // Extract the text after the number in Dosage for the first medicine
+        const currentSession = reminder.meds[0].Dosage.match(dosageRegex)?.[1] || '';
+        console.log("Current Session:", currentSession);
+
+        
+        // Search the phone number in the db and update the currentSession
+        console.log(reminder.recipientPhone)
+        const response = await Response.findOneAndUpdate(
+            { phone: reminder.recipientPhone },
+            { currentSession },
+            { new: true }   
+        );  
+
+
+        console.log("Response:", response);
+        
         whatsappService.sendMsg(message, reminder.recipientPhone);
         setTimeout(() => {
             whatsappService.sendMessageTemplate(process.env.PHNO);
@@ -123,8 +144,8 @@ function scheduleMedicineReminders() {
     const { hour, minute } = getCurrentTime();
     const reminderTimes = [
         { time: "Morning", schedule: `${minute + 1} ${hour} * * *` },
-        { time: "Lunch", schedule: `${minute + 2} ${hour} * * *` },
-        { time: "Dinner", schedule: `${minute + 3} ${hour} * * *` },
+        { time: "Lunch", schedule: `${minute + 5} ${hour} * * *` },
+        { time: "Dinner", schedule: `${minute + 6} ${hour} * * *` },
     ];
 
     reminderTimes.forEach(({ time, schedule }) => {

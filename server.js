@@ -20,10 +20,9 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
-// mongoose.connect(process.env.DB, {
-//   useNewUrlParser: true,
-//   useUnifiedTopology: true,
-// });
+// connect to mongooos eand cosole connected
+mongoose.connect(process.env.DB).then(console.log('DB Connected'));
+
 
 app.get("/", (req, res) => {
   res.send("Medication Reminder Service is running.");
@@ -78,24 +77,16 @@ app.post("/webhook", async (req, res) => {
       console.error("Error processing the image:", error);
       res.sendStatus(500);
     }
-  } 
+  }
   else if (messages && messages[0].type === "button" && messages[0].context) {
 
     console.log(messages);
     const interactiveData = messages.interactive;
     if (messages[0].button.text === "YES") {
-      // save the data to the database
-      
-      // const { name, quantity, time, days } = messages[0].context;
-      // const medicine = new Medicine({
-      //   name,
-      //   quantity,
-      //   time,
-      //   days,
-      // });
-      // medicine.save();
-      
-      
+
+
+
+
       console.log("User clicked YES");
       sendMsg("you clicked yes", process.env.PHNO);
       // Add your logic here for YES button click
@@ -111,7 +102,7 @@ app.post("/webhook", async (req, res) => {
 });
 
 //sendMsg("Hello Peeps", process.env.PHNO);
-// readMedicineDataFromFile();
+readMedicineDataFromFile();
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
