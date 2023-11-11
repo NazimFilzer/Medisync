@@ -77,12 +77,24 @@ app.post("/webhook", async (req, res) => {
       console.error("Error processing the image:", error);
       res.sendStatus(500);
     }
+  }else if(messages && messages[0].type === "text") { 
+    console.log(messages[0].text.body);
+    const response = await openAiMedBot(messages[0].text.body);
+    sendMsg(response, process.env.PHNO);
+    res.sendStatus(200);
+
+
   }
   else if (messages && messages[0].type === "button" && messages[0].context) {
 
     console.log(messages);
     const interactiveData = messages.interactive;
     if (messages[0].button.text === "YES") {
+      const response= await Response.findOne({phone: process.env.PHNO});
+      
+      if(response.curremtSession =="Morning"){
+        response.Morning = true;
+      }
 
 
 
