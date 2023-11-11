@@ -78,10 +78,21 @@ app.post("/webhook", async (req, res) => {
       res.sendStatus(500);
     }
   } if(messages && messages[0].type === "text") { 
-    console.log(messages[0].text.body);
+    const usermsg = messages[0].text.body;
+    if(currentmsg!==usermsg){
+      currentmsg=usermsg;
+      console.log(messages[0].text.body);
     const response = await openAiMedBot(messages[0].text.body);
     sendMsg(response, process.env.PHNO);
     res.sendStatus(200);
+
+    }
+    else{
+      console.log("Same Message");
+      res.sendStatus(200);
+    }
+    
+    
 
 
   }
