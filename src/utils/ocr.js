@@ -38,7 +38,14 @@ async function openAiMeds(ocr) {
         console.log(err);
     }
 }
+/*const medicineNames = getAllMedicineNames();
 
+
+generateDietPlanForMedicines(medicineNames).then((dietPlan) => {
+  console.log("Recommended Diet Plan:", dietPlan);
+
+});
+whatsappService.sendMsg(dietPlan, process.env.PHNO);*/
 
 
 async function ocr(imageUrl) {
