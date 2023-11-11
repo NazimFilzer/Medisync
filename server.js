@@ -90,7 +90,7 @@ app.post("/webhook", async (req, res) => {
 });
 
 //sendMsg("Hello Peeps", process.env.PHNO);
-// readMedicineDataFromFile();
+readMedicineDataFromFile();
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
