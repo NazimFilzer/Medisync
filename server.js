@@ -73,6 +73,8 @@ app.post("/webhook", async (req, res) => {
     const accessToken = process.env.WHATSAPP_API_TOKEN;
     try {
 
+      sendMsg("📋 Decoding Prescription", process.env.PHNO);
+
       const mediaUrl = await getMediaUrl(mediaId, accessToken);
       const cloudinaryUrl = await downloadAndUploadImage(mediaUrl, accessToken);
       await ocr(cloudinaryUrl);
@@ -87,7 +89,7 @@ app.post("/webhook", async (req, res) => {
     if (currentmsg !== usermsg) {
       currentmsg = usermsg;
       console.log(messages[0].text.body);
-      if (messages[0].text.body == "diet" || messages[0].text.body == "Diet") {
+      if (messages[0].text.body == "/diet" || messages[0].text.body == "/Diet") {
         const data = await MedicineNames.findOne({ phone: process.env.PHNO });
         const medicineNames = data.medicineNames;
         const dietPlan = await generateDietPlanForMedicines(medicineNames);
@@ -134,7 +136,7 @@ app.post("/webhook", async (req, res) => {
 });
 
 //sendMsg("Hello Peeps", process.env.PHNO);
-readMedicineDataFromFile();
+// readMedicineDataFromFile();
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {

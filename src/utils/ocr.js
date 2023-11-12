@@ -20,8 +20,8 @@ async function openAiMeds(ocr) {
                     },
                     {
                         role: "user",
-                        content: `Take the medicine name, medicine dosage and timigs from ${ocr} and convert in the form of 
-                        Medicine name | Dosage                  | Duration
+                        content: `Take the medicine name, medicine dosage and timings from ${ocr} and put these values in the format below 
+                            Medicine name | Dosage                  | Duration
                             Medecine1    | 1 Morning, 1 Dinner     | 10 days
                             Medecine1    | 1/2 Morning, 1/2 Dinner | 7 days
                             Medecine1    | 1 Lunch, 1 Dinner       | 10 days
