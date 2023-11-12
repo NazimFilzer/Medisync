@@ -11,11 +11,13 @@ const axios = require("axios");
 const cloudinary = require("cloudinary").v2;
 const { getMediaUrl, downloadAndUploadImage } = require("./src/utils/getImage");
 const { ocr } = require("./src/utils/ocr");
-const { readMedicineDataFromFile, stopCron } = require("./src/utils/scheduler");
+const { readMedicineDataFromFile, stopCron, generateDietPlanForMedicines } = require("./src/utils/scheduler");
 const mongoose = require("mongoose");
 const fs = require("fs");
 const Feedback = require("./models/feedback");
 const { openAiMedBot } = require("./src/utils/userConv");
+const MedicineNames = require("./models/medicineName");
+
 
 let currentmsg = "Hi";
 
@@ -85,9 +87,18 @@ app.post("/webhook", async (req, res) => {
     if (currentmsg !== usermsg) {
       currentmsg = usermsg;
       console.log(messages[0].text.body);
-      const response = await openAiMedBot(messages[0].text.body);
-      sendMsg(response, process.env.PHNO);
-      res.sendStatus(200);
+      if (messages[0].text.body == "diet" || messages[0].text.body == "Diet") {
+        const data = await MedicineNames.findOne({ phone: process.env.PHNO });
+        const medicineNames = data.medicineNames;
+        const dietPlan = await generateDietPlanForMedicines(medicineNames);
+        console.log("Generated Diet Plan");
+        sendMsg(dietPlan, process.env.PHNO);
+        res.sendStatus(200);
+      } else {
+        const response = await openAiMedBot(messages[0].text.body);
+        sendMsg(response, process.env.PHNO);
+        res.sendStatus(200);
+      }
 
     }
     else {
@@ -106,7 +117,6 @@ app.post("/webhook", async (req, res) => {
       const data = await Feedback.findOne({ phone: process.env.PHNO });
       data.setReminder = false;
       data.save();
-
       // Stop the remind_cron
       stopCron();
 
@@ -124,7 +134,7 @@ app.post("/webhook", async (req, res) => {
 });
 
 //sendMsg("Hello Peeps", process.env.PHNO);
-// readMedicineDataFromFile();
+readMedicineDataFromFile();
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {

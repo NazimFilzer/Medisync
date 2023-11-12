@@ -5,9 +5,10 @@ const whatsappService = require("../services/whatsappService");
 const OpenAI = require('openai').OpenAI;
 const Response = require('../../models/response');
 const Feedback = require("../../models/feedback");
+const MedicineNames = require("../../models/medicineName");
 
 let remind_cron;
-
+let medicineNames = [];
 
 // Initialize OpenAI
 const openai = new OpenAI({
@@ -24,6 +25,18 @@ function groupMedicinesByDosage(medicineData) {
         Lunch: [],
         Dinner: [],
     };
+
+    medicineNames = medicineData.slice(2).map(item => item['Medicine name']);
+
+    // Now seach the phone number in the db and update the medicineNames array  
+
+    // const saveMeds = MedicineNames.findOneAndUpdate(
+    //     { phone: process.env.PHNO },
+    //     { medicineNames },
+    //     { new: true }
+    // );
+
+    console.log(medicineNames)
 
     medicineData.forEach((medicine) => {
         const dosage = medicine.Dosage.split(", ");
@@ -48,35 +61,36 @@ function getAllMedicineNames() {
     return Array.from(allMedicineNames);
 }
 
-///dietplan
-// async function generateDietPlanForMedicines(medicineNames) {
-//   try {
-//     console.log("Generating diet plan for medicines...");
-//     if (medicineNames && medicineNames.length > 0) {
-//       const response = await openai.chat.completions.create({
-//         model: "gpt-3.5-turbo",
-//         messages: [
-//           {
-//             role: "system",
-//             content:
-//               "You are a diet recommendation bot. Provide a diet plan considering the dietary needs and restrictions of specific medicines.",
-//           },
-//           {
-//             role: "user",
-//             content: `I am taking these medicines: ${medicineNames.join(
-//               ", "
-//             )}. What diet plan should I follow considering these medicines?`,
-//           },
-//         ],
-//       });
+// dietplan
+async function generateDietPlanForMedicines(medicineNames) {
+    try {
+        console.log("Generating diet plan for medicines...");
+        if (medicineNames && medicineNames.length > 0) {
+            const response = await openai.chat.completions.create({
+                model: "gpt-3.5-turbo",
+                messages: [
+                    {
+                        role: "system",
+                        content:
+                            "You are a diet recommendation bot. Provide a diet plan considering the dietary needs and restrictions of specific medicines.",
+                    },
+                    {
+                        role: "user",
+                        content: `I am taking these medicines: ${medicineNames.join(
+                            ", "
+                        )}. What diet plan should I follow considering these medicines? Also give  Specific Plans for Breakfast, Lunch and Dinner. Add foods from Indian Diet and give options.`,
+                    },
+                ],
+            });
 
-//       return response.choices[0].message.content;
-//     }
-//   } catch (err) {
-//     console.log(err);
-//   }
-// }
-////
+            return response.choices[0].message.content;
+        }
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+
 function readMedicineDataFromFile() {
     const medicineData = [];
     const fileStream = fs.createReadStream("medicine_data.txt");
@@ -121,7 +135,7 @@ async function openAiMedPrecautions(medicineList) {
                         role: "user",
                         content: `Provide a brief list precautions for these medicines: ${medicineList.join(
                             ", "
-                        )}. The output should be concise for WhatsApp messaging Only 3 points.`,
+                        )}. The output should be concise for WhatsApp messaging Only 3 short points.`,
                     },
                 ],
             });
@@ -134,11 +148,12 @@ async function openAiMedPrecautions(medicineList) {
 }
 
 async function sendMedicineReminder(reminder) {
-    let message = `It's time to take your medicines: ${reminder.meds
-        .map(
-            (medicine) => `${medicine.MedicineName}, Dosage: ${medicine.Dosage}`
-        )
-        .join(" and ")}.`;
+
+    const saveMeds = await MedicineNames.findOneAndUpdate(
+        { phone: process.env.PHNO },
+        { medicineNames },
+        { new: true }
+    );
 
     if (reminder.meds && reminder.meds.length > 0) {
         const medicineNames = reminder.meds.map(med => med.MedicineName);
@@ -146,20 +161,15 @@ async function sendMedicineReminder(reminder) {
         if (precautions) {
             whatsappService.sendMsg(precautions, reminder.recipientPhone);
         }
+        console.log("Sending medicine reminder...",reminder.meds);
+        const timeOfDay = reminder.meds[0].Dosage.split(' ')[1]; // Extracting 'Morning', 'Lunch', or 'Dinner'
+        // console.log("Sending medicine reminder...", timeOfDay);
+        let message = `It's time for your  ${timeOfDay} medication ⏰  : ${reminder.meds
+            .map(
+                (medicine) => `${medicine.MedicineName}\nDosage: ${medicine.Dosage.split(' ')[0] + " Pill"}\n\n`
+            )
+            .join("")}`;
 
-        // Getting the Current Session time
-        const dosageRegex = /\d+\s+(.+)/;
-
-        // Extract the text after the number in Dosage for the first medicine
-        const currentSession = reminder.meds[0].Dosage.match(dosageRegex)?.[1] || '';
-
-
-        // Search the phone number in the db and update the currentSession
-        const response = await Response.findOneAndUpdate(
-            { phone: reminder.recipientPhone },
-            { currentSession },
-            { new: true }
-        );
 
         whatsappService.sendMsg(message, reminder.recipientPhone);
         setTimeout(() => {
@@ -198,7 +208,7 @@ function scheduleMedicineReminders() {
 
                 const feedback = await Feedback.findOneAndUpdate({ phone: process.env.PHNO }, { setReminder: true }, { new: true });
 
-                if (feedback.setReminder) {
+                if (feedback.setReminder === true) {
                     // Schedule follow-up reminder every 1 minutes for 3 times
                     for (let i = 1; i <= 3; i++) {
                         const followUpSchedule = `${minute + i * 1} ${hour} * * *`;
@@ -223,38 +233,26 @@ async function stopCron() {
 }
 
 async function sendReminder(reminder) {
-    let message = `It's time to take your medicines: ${reminder.meds
+
+
+    const timeOfDay = reminder.meds[0].Dosage.split(' ')[1]; // Extracting 'Morning', 'Lunch', or 'Dinner'
+    console.log("Sending medicine reminder...", timeOfDay);
+    let message = `It's time for your  ${timeOfDay} medication ⏰  : ${reminder.meds
         .map(
-            (medicine) => `${medicine.MedicineName}, Dosage: ${medicine.Dosage}`
+            (medicine) => `${medicine.MedicineName}\nDosage: ${medicine.Dosage.split(' ')[0] + " Pill"}\n\n`
         )
-        .join(" and ")}.`;
-
-    if (reminder.meds && reminder.meds.length > 0) {
-
-        // Getting the Current Session time
-        // const dosageRegex = /\d+\s+(.+)/;
-
-        // // Extract the text after the number in Dosage for the first medicine
-        // const currentSession = reminder.meds[0].Dosage.match(dosageRegex)?.[1] || '';
+        .join("")}`;
 
 
-        // // Search the phone number in the db and update the currentSession
-        // const response = await Response.findOneAndUpdate(
-        //     { phone: reminder.recipientPhone },
-        //     { currentSession },
-        //     { new: true }
-        // );
-
-        whatsappService.sendMsg(message, reminder.recipientPhone);
-        setTimeout(() => {
-            whatsappService.sendMessageTemplate(process.env.PHNO);
-        }, 3000);
-    }
+    whatsappService.sendMsg(message, reminder.recipientPhone);
+    setTimeout(() => {
+        whatsappService.sendMessageTemplate(process.env.PHNO);
+    }, 3000);
 }
 
 // Export setReminder variable and scheduleMedicineReminders function
 module.exports = {
     readMedicineDataFromFile,
     stopCron,  // Export the remind_cron instance
-   
+    generateDietPlanForMedicines
 };

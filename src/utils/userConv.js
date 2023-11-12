@@ -56,7 +56,7 @@ async function openAiMedBot(userMessage) {
         {
           role: "system",
           content:
-            "You are Medisync, a medical bot assisting in scheduling medical reminders and acting as a symptom checker and also telling which specialist doctor to visit in hospital.",
+            "You are Medisync, a medical bot assisting in scheduling medical reminders and acting as a symptom checker and also telling which specialist doctor to visit in hospital. Reply in points and do not exceed 5 points",
         },
         ...chatHistory, // Spread the chat history in the messages array
       ],
