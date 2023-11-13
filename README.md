@@ -27,3 +27,6 @@ Leveraging WhatsApp's accessibility and familiarity, we present a groundbreaking
 - **OCR Image Reading**: Utilizing Optical Character Recognition (OCR) technology for reading and extracting information from images, streamlining the input of prescription details.
 
 - **ChatGPT 3.5 API**: Harnessing the power of ChatGPT 3.5 API for intelligent and context-aware conversational interactions, enhancing the user experience and providing personalized support.
+
+### Video Link
+https://youtu.be/I2qe8quCXbk
