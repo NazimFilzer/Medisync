@@ -19,3 +19,11 @@ Leveraging WhatsApp's accessibility and familiarity, we present a groundbreaking
 
 4. **Addressing a Prevalent Issue: Revolutionizing Health Management**
    - Redefining health management to ensure consistent medication adherence and, consequently, improved health outcomes.
+
+### Technologies Used
+
+- **WhatsApp Cloud API**: Leveraging the WhatsApp Cloud API for seamless communication and integration with the popular messaging platform.
+
+- **OCR Image Reading**: Utilizing Optical Character Recognition (OCR) technology for reading and extracting information from images, streamlining the input of prescription details.
+
+- **ChatGPT 3.5 API**: Harnessing the power of ChatGPT 3.5 API for intelligent and context-aware conversational interactions, enhancing the user experience and providing personalized support.
